@@ -4,47 +4,63 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 
 public class Mazesolver {
-	public static HashMap <Node, HashSet<Node>> map = new HashMap <Node, HashSet<Node>>();
-	public static void makeneighbour(Node n,int i, int j, char[][] lis){
-		System.out.println("called");
-		HashSet<Node> hs = new HashSet<Node>();
-		if(i-1>='0'&&(lis[i-1][j]=='0'||lis[i-1][j]=='3')){
-			Node m = new Node();
-			if(lis[i-1][j]=='3')
-				m.setisfin();
-			hs.add(m);
-			makeneighbour(m,i-1,j,lis);
-		}
-		if(i+1<lis.length&&(lis[i+1][j]=='0'||lis[i+1][j]=='3')){
-			Node m = new Node();
-			if(lis[i+1][j]=='3'){
-				m.setisfin();
+
+	/**
+	 * Stores the map
+	 */
+	static char lis[][];
+	
+	/**
+	 * dimensions of the map
+	 */
+	static int height, width;
+	
+	static Node source;
+	static Node target;
+	
+	static List<Node> nodeList = new ArrayList<Node>();
+
+	/**
+	 * 
+	 * @param node
+	 * @return list of neighboring nodes of node 
+	 */
+	private static List<Node> getNeighbors(Node node){
+		List<Node> neighbors = new ArrayList<Node>();
+		for(Node n : nodeList){
+			if(n.isCoordinate(node.x - 1,node.y)||
+				n.isCoordinate(node.x + 1, node.y)||
+				n.isCoordinate(node.x, node.y - 1)||
+				n.isCoordinate(node.x, node.y + 1)){
+				neighbors.add(n);
 			}
-			hs.add(m);
-			makeneighbour(m,i+1,j,lis);
-			
 		}
-		if(j+1<lis[0].length&&(lis[i][j+1]=='0'||lis[i][j+1]=='3')){
-			Node m = new Node();
-			if(lis[i][j+1]=='3'){
-				m.setisfin();
-			}
-			hs.add(m);
-			makeneighbour(m,i,j+1,lis);
-		}
-		if(j-1>='0'&&(lis[i][j-1]=='0'||lis[i][j-1]=='3')){
-			Node m = new Node();
-			if(lis[i][j-1]=='3'){
-				m.setisfin();
-			}
-			hs.add(m);
-			makeneighbour(m,i,j-1,lis);
-		}
-		map.put(n, hs);
+		return neighbors;
 	}
+	
+	private static void initializeNodeList(){
+		for(int i=0; i<height;i++){
+			for(int j =0; j<width;j++ ){
+				Node newNode = new Node(j,i);
+				if (lis[i][j] == '1'){
+					continue;
+				}
+				if (lis[i][j]=='2'){
+					newNode.setvalue(0);
+					source = newNode;	
+				}
+				if (lis[i][j] == '3'){
+					target = newNode;
+				}
+				nodeList.add(newNode);
+			}
+		}
+	}
+	
 	public static void main(String[] args) throws Exception{
 		BufferedReader br = new BufferedReader(new FileReader("map_0.txt"));
 		ArrayList <String> strlist = new ArrayList<String>();
@@ -53,7 +69,11 @@ public class Mazesolver {
 		   // process the line.
 			strlist.add(line);
 		}
-		char lis[][] = new char[strlist.size()][strlist.get(0).length()];
+		
+		height = strlist.size();
+		width = strlist.get(0).length();
+
+		lis = new char[strlist.size()][strlist.get(0).length()];
 		for(int i=0; i<strlist.size();i++){
 			for(int j =0; j<strlist.get(0).length();j++ ){
 				lis[i][j]=strlist.get(i).charAt(j);
@@ -61,17 +81,11 @@ public class Mazesolver {
 		}
 		br.close();
 		
-		for(int i=0;i<lis.length;i++){
-			for(int j=0;j<lis[0].length;j++){
-				if(lis[i][j]=='2'){
-					Node n = new Node();
-					makeneighbour(n,i,j,lis);
-					break;
-				}
-			}
-			//System.out.println();
-		}
-		System.out.println(map.size()+""+map.values().size());
+		initializeNodeList();
+		
+		// Dijkstra's Algorithm here
+		// TODO
+		
 	}
 	
 }
